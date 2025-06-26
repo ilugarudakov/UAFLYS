@@ -1,0 +1,6 @@
+/vendor/
+/node_modules/
+/backend/data/database.sqlite
+/.idea/
+/*.iml
+/docs/

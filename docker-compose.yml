@@ -1,0 +1,34 @@
+version: "3.8"
+
+services:
+  composer:
+    image: composer:2
+    working_dir: /app
+    volumes:
+      - ./backend:/app
+      - backend_vendor:/app/vendor
+    command: install --prefer-dist --no-interaction
+
+  backend:
+    image: php:8.4-cli
+    working_dir: /app
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+      - ./backend/data:/app/data
+      - backend_vendor:/app/vendor
+    depends_on:
+      - composer
+
+    command: php -S 0.0.0.0:8000 -t public
+
+  frontend:
+    image: nginx:alpine
+    ports:
+      - "3000:80"
+    volumes:
+      - ./frontend/public:/usr/share/nginx/html:ro
+
+volumes:
+  backend_vendor:
