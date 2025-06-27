@@ -6,7 +6,7 @@ services:
     working_dir: /app
     volumes:
       - ./backend:/app
-      - backend_vendor:/app/vendor
+      - ./backend/vendor:/app/vendor
     command: install --prefer-dist --no-interaction
 
   backend:
@@ -17,10 +17,9 @@ services:
     volumes:
       - ./backend:/app
       - ./backend/data:/app/data
-      - backend_vendor:/app/vendor
+      - ./backend/vendor:/app/vendor
     depends_on:
       - composer
-
     command: php -S 0.0.0.0:8000 -t public
 
   frontend:
@@ -29,6 +28,3 @@ services:
       - "3000:80"
     volumes:
       - ./frontend/public:/usr/share/nginx/html:ro
-
-volumes:
-  backend_vendor:
