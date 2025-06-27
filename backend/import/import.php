@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+const ALLOWED_AIRPORTS = ['FCO','AYT','OTP','DUS','IST'];
+
 /**
  * Создание соединения с SQLite и включение внешних ключей
  */
@@ -39,7 +41,7 @@ function importAirports(PDO $db, string $filePath): void {
             continue;
         }
         [$id, $name, $city, $country, $iata, $icao] = $row;
-        if ($iata === '\\N' || strlen($iata) !== 3) {
+        if ($iata === '\N' || strlen($iata) !== 3 || !in_array($iata, ALLOWED_AIRPORTS, true)) {
             continue;
         }
         $stmt->execute([$id, $name, $city, $country, $iata, $icao]);
