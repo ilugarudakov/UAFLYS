@@ -140,8 +140,8 @@ function importRoutes(PDO $db, string $filePath): void {
 }
 
 function main(): void {
-    $dbFile     = __DIR__ . '/db/data.sqlite';
-    $schemaFile = __DIR__ . '/schema_with_fks.sql';
+    $dbFile     = __DIR__ . '/../data/data.sqlite';
+    $schemaFile = __DIR__ . '/../migrations/schema_with_fks.sql';
 
     if (file_exists($dbFile)) {
         unlink($dbFile);
@@ -153,9 +153,22 @@ function main(): void {
     $db = connectDB($dbFile);
     runSchema($db, $schemaFile);
 
-    importAirports($db, __DIR__ . '/data/airports.dat');
-    importAirlines($db, __DIR__ . '/data/airlines.dat');
-    importRoutes($db, __DIR__ . '/data/routes.dat');
+    $files = [
+        'airports'  => __DIR__ . '/raw/airports.dat',
+        'airlines'  => __DIR__ . '/raw/airlines.dat',
+        'routes'    => __DIR__ . '/raw/routes.dat',
+    ];
+
+    foreach ($files as $type => $path) {
+        if (!file_exists($path)) {
+            fwrite(STDERR, "Ошибка: файл данных для импорта «{$type}» не найден по пути: {$path}\n");
+            exit(1);
+        }
+    }
+
+    importAirports($db, $files['airports']);
+    importAirlines($db, $files['airlines']);
+    importRoutes($db, $files['routes']);
 
     echo "Импорт завершен успешно.\n";
 }
