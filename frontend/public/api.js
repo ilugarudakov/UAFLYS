@@ -17,12 +17,15 @@ async function fetchRoutes({ from, to, airline, depth }) {
     if (airline) params.append('airline', airline);
     const url = `${API}/routes?${params}`;
     const res = await fetch(url);
-    if (!res.ok) {
-        const text = await res.text();
-        console.error(`Ошибка ${res.status} при запросе ${url}:\n`, text);
-        throw new Error(res.statusText);
+    const txt = await res.text();
+    try {
+        const data = JSON.parse(txt);
+        if (!res.ok) throw new Error(data.error || res.statusText);
+        return data;
+    } catch {
+        console.error(`Ошибка ${res.status} при запросе ${url}:\n`, txt);
+        throw new Error('Неверный формат ответа от сервера');
     }
-    return res.json();
 }
 
 function populateSelects(airports) {
@@ -41,24 +44,30 @@ function populateAirlines(airlines) {
     const sel = document.getElementById('airline');
     sel.innerHTML = '<option value="">— Все авиакомпании —</option>';
     airlines.forEach(a => {
-        sel.add(new Option(a.name, a.code));
+        sel.add(new Option(`${a.code} — ${a.name}`, a.code));
     });
 }
 
+function updateSubmitState() {
+    const btn  = document.getElementById('submitBtn');
+    const from = document.getElementById('from').value;
+    const to   = document.getElementById('to').value;
+    btn.disabled = !(from && to);
+}
+
+function showError(msg) {
+    document.getElementById('errorMsg').textContent = msg;
+}
+
 function renderRoutes(routes) {
-    const container = document.getElementById('results');
+    const c = document.getElementById('results');
     if (!routes.length) {
-        container.innerHTML = '<p>Маршрутов не найдено.</p>';
+        c.innerHTML = '<p>Маршрутов не найдено.</p>';
         return;
     }
-    let html = '<table class="table table-striped">';
-    html += `<thead>
-    <tr>
-      <th>Путь</th>
-      <th>Пересадки</th>
-      <th>Авиакомпании</th>
-    </tr>
-  </thead><tbody>`;
+    let html = '<table class="table table-striped"><thead><tr>'
+        + '<th>Путь</th><th>Пересадки</th><th>Авиакомпании</th>'
+        + '</tr></thead><tbody>';
     routes.forEach(r => {
         html += `<tr>
       <td>${r.path.join(' → ')}</td>
@@ -67,36 +76,41 @@ function renderRoutes(routes) {
     </tr>`;
     });
     html += '</tbody></table>';
-    container.innerHTML = html;
+    c.innerHTML = html;
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
     try {
-        // Подгружаем справочники
         const [airports, airlines] = await Promise.all([
             fetchAirports(),
             fetchAirlines()
         ]);
         populateSelects(airports);
         populateAirlines(airlines);
+        ['from','to'].forEach(id =>
+            document.getElementById(id).addEventListener('change', updateSubmitState)
+        );
     } catch (e) {
         console.error('Ошибка загрузки справочников:', e);
+        showError('Не удалось загрузить данные. Попробуйте обновить страницу.');
     }
 
-    // Вешаем сабмит
     document.getElementById('searchForm').addEventListener('submit', async e => {
         e.preventDefault();
+        showError('');
+
         const from    = document.getElementById('from').value;
         const to      = document.getElementById('to').value;
         const airline = document.getElementById('airline').value;
         const depth   = document.querySelector('input[name=depth]:checked').value;
+
         try {
             const routes = await fetchRoutes({ from, to, airline, depth });
             renderRoutes(routes);
         } catch (err) {
             console.error('Ошибка поиска маршрутов:', err);
-            document.getElementById('results').innerHTML =
-                '<p class="text-danger">Не удалось выполнить поиск. Проверьте консоль.</p>';
+            showError(err.message);
+            document.getElementById('results').innerHTML = '';
         }
     });
 });
