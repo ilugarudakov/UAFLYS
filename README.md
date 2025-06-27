@@ -5,7 +5,10 @@
 Из корня проекта выполните:
 
 ```bash
+
 docker compose up --build
+
+```
 
 API доступно по адресу http://localhost:8000
 
