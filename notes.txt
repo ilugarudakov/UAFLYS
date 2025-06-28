@@ -1,3 +1,5 @@
+docker compose run --rm composer update
+
 Импорт и миграции
 
 Убедиться, что backend/migrations/init_db.php и backend/import/import.php отрабатывают в Docker-контейнере (запуском через docker compose exec backend …).

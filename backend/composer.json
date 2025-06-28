@@ -2,9 +2,7 @@
   "name": "uaflys/backend",
   "description": "API для демо-поиска авиамаршрутов",
   "require": {
-    "nikic/fast-route": "^1.3",
-    "league/csv": "^9.8",
-    "vlucas/phpdotenv": "^5.5"
+    "league/csv": "^9.8"
   },
   "autoload": {
     "psr-4": {
