@@ -7,6 +7,7 @@ const ALLOWED_AIRPORTS = ['FCO','AYT','OTP','DUS','IST'];
 /**
  * Создание соединения с SQLite и включение внешних ключей
  */
+
 function connectDB(string $dbFile): PDO {
     $db = new PDO('sqlite:' . $dbFile);
     $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -76,6 +77,13 @@ function importAirlines(PDO $db, string $filePath): void {
         if ($iata === '\\N') {
             continue;
         }
+
+        // игнорирую авиалинии без кода iata
+
+        if ($iata === '\N' || $iata === '' || strlen($iata) !== 2) {
+            continue;
+        }
+
         $stmt->execute([$id, $name, $alias, $iata, $icao, $active]);
         if (++$count % 500 === 0) {
             echo '.';

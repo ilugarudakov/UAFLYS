@@ -4,7 +4,6 @@ DROP TABLE IF EXISTS routes;
 DROP TABLE IF EXISTS airlines;
 DROP TABLE IF EXISTS airports;
 
--- airports
 CREATE TABLE airports (
                           id INTEGER PRIMARY KEY,
                           name TEXT,
@@ -14,7 +13,6 @@ CREATE TABLE airports (
                           icao TEXT
 );
 
--- airlines
 CREATE TABLE airlines (
                           id INTEGER PRIMARY KEY,
                           name TEXT,
@@ -24,7 +22,6 @@ CREATE TABLE airlines (
                           active TEXT
 );
 
--- routes
 CREATE TABLE routes (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         airline TEXT,
