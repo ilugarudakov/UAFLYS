@@ -19,15 +19,19 @@ class RouteController
         $airline = $_GET['airline'] ?? '';
         $depth   = min(2, max(0, (int)($_GET['depth'] ?? 0)));
 
+        // Новая проверка: если точки совпадают — сразу пустой массив
+        if ($from === $to) {
+            echo json_encode([], JSON_UNESCAPED_UNICODE);
+            return;
+        }
+
         if (!$from || !$to) {
             http_response_code(400);
             echo json_encode(['error'=>'from и to обязательны'], JSON_UNESCAPED_UNICODE);
             return;
         }
 
-        echo json_encode(
-            $this->repo->findRoutes($from, $to, $airline, $depth),
-            JSON_UNESCAPED_UNICODE
-        );
+        $data = $this->repo->findRoutes($from, $to, $airline, $depth);
+        echo json_encode($data, JSON_UNESCAPED_UNICODE);
     }
 }

@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 const ALLOWED_AIRPORTS = ['FCO','AYT','OTP','DUS','IST'];
 
-/**
- * Создание соединения с SQLite и включение внешних ключей
- */
+//подключение к базе
 
 function connectDB(string $dbFile): PDO {
     $db = new PDO('sqlite:' . $dbFile);
@@ -15,17 +13,15 @@ function connectDB(string $dbFile): PDO {
     return $db;
 }
 
-/**
- * Выполнить SQL-схему из файла
- */
+// инициализация таблицы
+
 function runSchema(PDO $db, string $schemaFile): void {
     $schema = file_get_contents($schemaFile);
     $db->exec($schema);
 }
 
-/**
- * Импорт аэропортов из CSV
- */
+//импорты
+
 function importAirports(PDO $db, string $filePath): void {
     echo "Импорт аэропортов...\n";
     $file = new SplFileObject($filePath, 'r');
@@ -53,9 +49,6 @@ function importAirports(PDO $db, string $filePath): void {
     echo "\nАэропорты загружены: $count\n";
 }
 
-/**
- * Импорт авиакомпаний из CSV
- */
 function importAirlines(PDO $db, string $filePath): void {
     echo "Импорт авиакомпаний...\n";
     $file = new SplFileObject($filePath, 'r');
@@ -92,9 +85,6 @@ function importAirlines(PDO $db, string $filePath): void {
     echo "\nАвиакомпании загружены: $count\n";
 }
 
-/**
- * Импорт маршрутов из CSV с проверкой наличия внешних ключей
- */
 function importRoutes(PDO $db, string $filePath): void {
     echo "Импорт маршрутов...\n";
     $file = new SplFileObject($filePath, 'r');
